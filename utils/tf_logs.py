@@ -57,12 +57,7 @@ def eval_step_logs(writer, env, eval_step, state, actions=None, reward=None, pro
                 tf.summary.scalar("Value", value, step=eval_step)
             if actions is not None: 
                 tf.summary.scalar("Num actions", len(actions), step=eval_step)
-            #por cada momento del horizonte no hace falta evaluar esto
-            # if env.cost:
-            #     min_cost = min(env.cost)
-            #     min_index = env.cost.index(min_cost)
-            #     tf.summary.scalar("Min cost", min_cost, step=eval_step)
-            #     tf.summary.scalar("Min cost horizont", min_index, step=eval_step)
+
 
         
         writer.flush()
@@ -71,18 +66,7 @@ def eval_final_log(writer, eval_episode, env, network):
     with writer.as_default():
         with tf.name_scope('Eval'):
             pass
-            #tf.summary.scalar("Number of Nodes", num_nodes, step=eval_episode)
-            #tf.summary.scalar("Number of Sample", num_sample, step=eval_episode)
-            # tf.summary.scalar(network + " - Starting Max LU", max_link_utilization[0], step=eval_episode)
-            #idx_min_max = np.argmin(max_link_utilization)
-            #tf.summary.scalar("Min Max LU", max_link_utilization[idx_min_max], step=eval_episode)
-            #tf.summary.scalar("Min Max LU - Mean LU", mean_link_utilization[idx_min_max], step=eval_episode)
-            #episode_length = len(max_link_utilization)
-            # idx_min_max = np.argmin(max_link_utilization)
-            # tf.summary.scalar(network + " - Min Max LU", max_link_utilization[idx_min_max], step=eval_episode)
-            #idx_min_mean = np.argmin(mean_link_utilization)
-            #tf.summary.scalar("Min Mean LU", mean_link_utilization[idx_min_mean], step=eval_episode)
-            #tf.summary.scalar("Min Mean LU - Max LU", max_link_utilization[idx_min_mean], step=eval_episode)
+
             min_cost = min(env.cost)
             min_index = env.cost.index(min_cost)
             try:

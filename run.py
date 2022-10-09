@@ -96,7 +96,7 @@ dropout_rate = 0.2
 activation_fn='tanh'
 mode ='training'
 episode = 224
-experiment_identifier = set_experiment_identifier(network,env_number ,create_message_nn,generator_slices,horizon,reward_magnitude,reward_computation,batch_size,gae_lambda,learning_rate,epsilon,clip_param,gamma,eval_period,epochs,node_state_size,message_iterations,dropout_rate,activation_fn,mode)
+experiment_identifier = set_experiment_identifier(network, env_number ,create_message_nn,generator_slices,horizon,reward_magnitude,reward_computation,batch_size,gae_lambda,learning_rate,epsilon,clip_param,gamma,eval_period,epochs,node_state_size,message_iterations,dropout_rate,activation_fn,mode)
 dir_check = 'checkpoints_historicos/' + experiment_identifier + '/episode' + str(episode)
 
 def main(argv=None):
@@ -111,7 +111,7 @@ def main(argv=None):
 
     # orig_stdout = sys.stdout
     # orig_stderr = sys.stderr
-
+    #to evaluate you must specify model directory
     #runner = Runner(model_dir=sys.path[0] + '/' + dir_check, only_eval=True)
 
 

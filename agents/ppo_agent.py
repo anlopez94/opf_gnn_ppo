@@ -211,13 +211,13 @@ class PPOAgent(object):
             training_episode += 1
             print(f'Episode {training_episode} starting {self.env.num_sample}')
             states, actions, rewards, log_probs, values, last_value, t = self.run_episode()
-            # print('Acabo run episode')
+
             returns, advantages = self.gae_estimation(rewards, values, last_value)
-            # print('Acabo gae_estimation')
+
 
             actor_losses, critic_losses, losses = self.run_update(training_episode, states, actions, returns,
                                                                   advantages, log_probs)
-            # print('run_update')
+
             tf_logs.training_episode_logs(self.writer, self.env, training_episode, states, rewards, losses,
                                           actor_losses, critic_losses, t)
             results.save_episode(self.env, training_episode, states, rewards, losses, actor_losses, critic_losses, t)
@@ -411,7 +411,6 @@ class PPOAgent(object):
 
     # @tf.function
     def act(self, state, select_max=False):
-        #TODO: entender bien esto para explicar en memoria
         logits = self.training_actor[self.env.network](state)
         # print(logits)
         probs = tfp.distributions.Categorical(logits=logits)
