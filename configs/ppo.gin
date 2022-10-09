@@ -1,0 +1,54 @@
+import agents.ppo_agent
+import lib.actor
+import lib.critic
+import gin.tf.external_configurables
+
+PPOAgent.max_simultaneous_actions = 1
+
+PPOAgent.gamma = 0.95
+PPOAgent.clip_param = 0.2
+PPOAgent.batch_size = 25
+PPOAgent.select_max_action = False
+PPOAgent.epochs = 3
+PPOAgent.gae_lambda = 0.9 
+PPOAgent.horizon = None
+
+PPOAgent.eval_env_type='case30'
+PPOAgent.eval_period = 10
+PPOAgent.last_training_sample = 80
+PPOAgent.max_evals = 500
+PPOAgent.num_eval_samples = 1
+PPOAgent.change_load=False
+PPOAgent.change_load_period=1
+
+PPOAgent.critic_loss_factor=0.5
+PPOAgent.entropy_loss_factor=0.001
+PPOAgent.normalize_advantages=True
+PPOAgent.max_grad_norm=1.0
+PPOAgent.optimizer = @tf.keras.optimizers.Adam()
+tf.keras.optimizers.Adam.learning_rate=0.0003
+tf.keras.optimizers.Adam.beta_1=0.9
+tf.keras.optimizers.Adam.epsilon=0.1
+
+Actor.create_message_nn = True
+Actor.node_state_size = 16
+Actor.dropout_rate = 0.2
+Actor.message_iterations = 4
+Actor.activation_fn = 'tanh'
+Actor.final_activation_fn='linear'
+Actor.hidden_units_update="128-64-16"
+Actor.hidden_units_readout="32-16"
+Actor.hidden_units_message="64-16"
+
+
+Critic.create_message_nn = True
+Critic.node_state_size = 16
+Critic.dropout_rate = 0.2
+Critic.message_iterations = 4
+Critic.activation_fn = 'tanh'
+Critic.final_activation_fn='linear'
+Critic.hidden_units_update="128-64-16"
+Critic.hidden_units_readout="64-16"
+Critic.hidden_units_message="64-16"
+
+

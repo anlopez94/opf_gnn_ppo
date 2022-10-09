@@ -1,0 +1,17 @@
+import lib.run_experiment
+import environment.environment
+import gin.tf.external_configurables
+
+Runner.algorithm = 'PPO'
+Runner.reload_model = False
+Runner.model_dir = 'checkpoints/...'
+Runner.only_eval = False
+Runner.save_checkpoints = True
+
+Environment.env_type = 'case30'
+Environment.env_number = 'load_15'
+Environment.reward_magnitude = 'cost'
+Environment.reward_computation = 'change'
+
+Environment.horizon_percentage = 0.5
+Environment.generator_slices = 50
