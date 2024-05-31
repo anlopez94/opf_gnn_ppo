@@ -1,6 +1,4 @@
 import gin.tf
-from itertools import tee
-import numpy as np
 
 
 def load_gin_configs(gin_files, gin_bindings):
@@ -11,6 +9,6 @@ def load_gin_configs(gin_files, gin_bindings):
       gin_bindings: list, of gin parameter bindings to override the values in
         the config files.
     """
-    gin.parse_config_files_and_bindings(gin_files,
-                                        bindings=gin_bindings,
-                                        skip_unknown=False)
+    gin.parse_config_files_and_bindings(
+        gin_files, bindings=gin_bindings, skip_unknown=False
+    )

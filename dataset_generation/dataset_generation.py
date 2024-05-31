@@ -3,16 +3,12 @@ import pandapower
 
 net = pandapower.networks.case9()
 print(net)
-pandapower.to_excel(net, 'dataset/case9.xlsx')
+pandapower.to_excel(net, "dataset/case9.xlsx")
 solution = pandapower.runpp(net)
-pandapower.to_excel(net, 'dataset/case9_pf.xlsx')
+pandapower.to_excel(net, "dataset/case9_pf.xlsx")
 
 solution = pandapower.runopp(net)
-pandapower.to_excel(net, 'dataset/case9_opf.xlsx')
-
-
-
-
+pandapower.to_excel(net, "dataset/case9_opf.xlsx")
 
 
 #

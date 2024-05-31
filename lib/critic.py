@@ -8,30 +8,28 @@ Original file is located at
 """
 
 from tensorflow.keras import layers
-import pandas as pd
-import os
 from tensorflow import keras
-import networkx as nx
-import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 
 
 import gin.tf
+
+
 @gin.configurable
 class Critic(tf.keras.Model):
     def __init__(
         self,
         graph_info,
-        hidden_units_update='256-128-32]',
-        hidden_units_readout='128-32',
-        hidden_units_message='128-32',
+        hidden_units_update="256-128-32]",
+        hidden_units_readout="128-32",
+        hidden_units_message="128-32",
         dropout_rate=0.2,
         normalize=True,
         node_state_size=32,
         message_iterations=3,
-        activation_fn='tanh',
-        final_activation_fn='linear',
+        activation_fn="tanh",
+        final_activation_fn="linear",
         create_message_nn=False,
         *args,
         **kwargs,
@@ -58,28 +56,35 @@ class Critic(tf.keras.Model):
         # if (activation_fn == 'tanh'):
         #     self.activation_fn = tf.nn.tanh
         self.final_activation_fn = final_activation_fn
-        self.hidden_layer_initializer = tf.keras.initializers.Orthogonal(gain=np.sqrt(2))
+        self.hidden_layer_initializer = tf.keras.initializers.Orthogonal(
+            gain=np.sqrt(2)
+        )
         self.final_layer_initializer = tf.keras.initializers.Orthogonal(gain=1)
         self.kernel_regularizer = None  # keras.regularizers.l2(0.01)
 
         # self.postprocess = create_ffn(hidden_units, dropout_rate, name="postprocess")
         # Create a compute logits layer.
         fnn_layers = self.create_ffn(self.hidden_units_readout, self.dropout_rate)
-        #ultima capa de la readout
+        # ultima capa de la readout
         fnn_layers.append(layers.Dropout(dropout_rate))
-        fnn_layers.append(layers.Dense(units=1, activation=self.final_activation_fn, kernel_initializer=self.final_layer_initializer,
-                             kernel_regularizer=self.kernel_regularizer, name="readout"))
-        self.readout = keras.Sequential(fnn_layers, name='readout')
+        fnn_layers.append(
+            layers.Dense(
+                units=1,
+                activation=self.final_activation_fn,
+                kernel_initializer=self.final_layer_initializer,
+                kernel_regularizer=self.kernel_regularizer,
+                name="readout",
+            )
+        )
+        self.readout = keras.Sequential(fnn_layers, name="readout")
         self.normalize = normalize
         # self.ffn_prepare = create_ffn(hidden_units, dropout_rate)
         fnn_layers = self.create_ffn(self.hidden_units_update, 0)
-        self.update_fn = keras.Sequential(fnn_layers, name='update_fn')
+        self.update_fn = keras.Sequential(fnn_layers, name="update_fn")
 
         if self.create_message_nn:
             fnn_layers = self.create_ffn(self.hidden_units_message, 0)
-            self.create_message = keras.Sequential(fnn_layers, name='message_fn')
-
-
+            self.create_message = keras.Sequential(fnn_layers, name="message_fn")
 
     def aggregate(self, node_indices, neighbour_messages):
         # node_indices shape is [num_edges].
@@ -95,9 +100,11 @@ class Critic(tf.keras.Model):
         aggregated_message_min = tf.math.unsorted_segment_min(
             neighbour_messages, node_indices, num_segments=num_nodes
         )
-        aggregated_message = tf.concat([aggregated_message_mean, aggregated_message_max, aggregated_message_min], axis=1)
+        aggregated_message = tf.concat(
+            [aggregated_message_mean, aggregated_message_max, aggregated_message_min],
+            axis=1,
+        )
         return aggregated_message
-
 
     def update(self, node_repesentations, aggregated_messages):
         h = tf.concat([node_repesentations, aggregated_messages], axis=1)
@@ -106,7 +113,6 @@ class Critic(tf.keras.Model):
         if self.normalize:
             node_embeddings = tf.nn.l2_normalize(node_embeddings, axis=-1)
         return node_embeddings
-
 
     def prepare(self, nodes_features, edges, edge_weights, num_nodes):
         node_indices, neighbour_indices = edges[0], edges[1]
@@ -123,7 +129,10 @@ class Critic(tf.keras.Model):
             edge_weights, node_indices, num_segments=num_nodes
         )
 
-        node_repesentations = tf.concat([nodes_features, weights_mean, weights_max, weights_min, weights_sum], axis=-1)
+        node_repesentations = tf.concat(
+            [nodes_features, weights_mean, weights_max, weights_min, weights_sum],
+            axis=-1,
+        )
         # node_repesentations = tf.concat([weights_mean, weights_max, weights_min, weights_sum], axis=-1)
         # node_repesentations = tf.concat([nodes_features, node_repesentations], axis=-1)
         padding = [[0, 0], [0, self.node_state_size - node_repesentations.shape[1]]]
@@ -131,12 +140,13 @@ class Critic(tf.keras.Model):
 
         return node_repesentations
 
-
     def build(self):
         self.update_fn.build(input_shape=[None, 4 * self.node_state_size])
         self.readout.build(input_shape=[None, 3 * self.node_state_size])
         if self.create_message_nn:
-            self.create_message.build(input_shape=[None, 2 * self.node_state_size + self.num_features_edge])
+            self.create_message.build(
+                input_shape=[None, 2 * self.node_state_size + self.num_features_edge]
+            )
         self.built = True
 
     def create_ffn(self, hidden_units, dropout_rate):
@@ -147,17 +157,30 @@ class Critic(tf.keras.Model):
             if dropout_rate > 0:
                 fnn_layers.append(layers.Dropout(dropout_rate))
             fnn_layers.append(
-                layers.Dense(units, activation=self.activation_fn, kernel_initializer=initializer,
-                             kernel_regularizer=self.kernel_regularizer))
+                layers.Dense(
+                    units,
+                    activation=self.activation_fn,
+                    kernel_initializer=initializer,
+                    kernel_regularizer=self.kernel_regularizer,
+                )
+            )
 
         return fnn_layers
 
-
     def prepare_message(self, node_repesentations):
         node_indices, neighbour_indices = self.edges[0], self.edges[1]
-        neighbour_representation_link = tf.gather(node_repesentations, neighbour_indices)
+        neighbour_representation_link = tf.gather(
+            node_repesentations, neighbour_indices
+        )
         node_representation_link = tf.gather(node_repesentations, node_indices)
-        message_pre = tf.concat([neighbour_representation_link, self.edge_weights, node_representation_link], axis=1)
+        message_pre = tf.concat(
+            [
+                neighbour_representation_link,
+                self.edge_weights,
+                node_representation_link,
+            ],
+            axis=1,
+        )
         return message_pre
 
     def call(self, input):
@@ -167,7 +190,9 @@ class Critic(tf.keras.Model):
         # Get node_indices (source) and neighbour_indices (target) from edges.
         node_indices, neighbour_indices = self.edges[0], self.edges[1]
         # neighbour_repesentations shape is [num_edges, representation_dim].
-        node_repesentations = self.prepare(node_features, self.edges, self.edge_weights, self.num_nodes)
+        node_repesentations = self.prepare(
+            node_features, self.edges, self.edge_weights, self.num_nodes
+        )
         for _ in range(self.message_iterations):
             # neighbour_messages = tf.gather(node_repesentations, neighbour_indices)
             if self.create_message_nn:
@@ -189,14 +214,15 @@ class Critic(tf.keras.Model):
         node_repesentations_max = tf.expand_dims(node_repesentations_max, axis=0)
         node_repesentations_min = tf.math.reduce_min(node_repesentations, axis=0)
         node_repesentations_min = tf.expand_dims(node_repesentations_min, axis=0)
-        readout_input = tf.concat([node_repesentations_mean, node_repesentations_max, node_repesentations_min], axis=-1)
+        readout_input = tf.concat(
+            [
+                node_repesentations_mean,
+                node_repesentations_max,
+                node_repesentations_min,
+            ],
+            axis=-1,
+        )
         # Compute logits
         # node_repesentations = tf.Tensor([self.generators_nodes])
         values = self.readout(readout_input)
         return tf.reshape(values, [-1])
-
-
-
-
-
-

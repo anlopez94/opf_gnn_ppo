@@ -7,25 +7,27 @@ import logging
 import tensorflow as tf
 
 import gin.tf
+
+
 @gin.configurable
 class Runner(object):
-
-    def __init__(self,
-                 algorithm='PPO',
-                 reload_model=False,
-                 model_dir=None,
-                 only_eval=False,
-                 base_dir='logs',
-                 checkpoint_base_dir='checkpoints',
-                 save_checkpoints=True):
-
+    def __init__(
+        self,
+        algorithm="PPO",
+        reload_model=False,
+        model_dir=None,
+        only_eval=False,
+        base_dir="logs",
+        checkpoint_base_dir="checkpoints",
+        save_checkpoints=True,
+    ):
         env = Environment()
         self.save_checkpoints = save_checkpoints
-        if algorithm == 'PPO':
+        if algorithm == "PPO":
             self.agent = PPOAgent(env, save_checkpoints=save_checkpoints)
         else:
             # Insert  here your customized RL algorithm
-            assert (False), 'RL Algorithm %s is not implemented' % algorithm
+            assert False, "RL Algorithm %s is not implemented" % algorithm
 
         self.base_dir = base_dir
         self.checkpoint_base_dir = checkpoint_base_dir
@@ -36,7 +38,6 @@ class Runner(object):
         self.set_logs_and_checkpoints()
 
     def run_experiment(self):
-
         if self.only_eval:
             self.agent.only_evaluate()
         else:
@@ -49,7 +50,7 @@ class Runner(object):
         if not os.path.exists(writer_dir):
             os.makedirs(writer_dir)
         else:
-            for f in glob.glob(os.path.join(writer_dir, 'events.out.tfevents.*')):
+            for f in glob.glob(os.path.join(writer_dir, "events.out.tfevents.*")):
                 os.remove(f)
 
         checkpoint_dir = os.path.join(self.checkpoint_base_dir, experiment_identifier)
@@ -58,10 +59,8 @@ class Runner(object):
 
         self.agent.set_writer_and_checkpoint_dir(writer_dir, checkpoint_dir)
 
-        f = open(os.path.join(writer_dir, 'out.log'), 'w+')
+        f = open(os.path.join(writer_dir, "out.log"), "w+")
         f.close()
-        fh = logging.FileHandler(os.path.join(writer_dir, 'out.log'))
+        fh = logging.FileHandler(os.path.join(writer_dir, "out.log"))
         fh.setLevel(logging.DEBUG)  # or any level you want
         tf.get_logger().addHandler(fh)
-
-
